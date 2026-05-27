@@ -1,0 +1,99 @@
+# =========================================================================
+# CONFIGURAÇÃO RECOMENDADA DO NGINX: Bot Disparo
+# =========================================================================
+#
+# Salve esta configuração ou copie as partes necessárias para o seu arquivo
+# de configuração de sites do Nginx (geralmente em /etc/nginx/sites-enabled/ultracrm)
+#
+# Ajuste o caminho '/var/www/bot-disparo' se a sua pasta no servidor for diferente.
+
+# =========================================================================
+# OPÇÃO A: Se você está inserindo dentro de um bloco 'server' existente
+# (Como sugerido no deploy.sh)
+# =========================================================================
+
+# 1. FRONTEND: Configuração de arquivos estáticos e Rotas do React SPA
+location /disparos {
+    alias /var/www/bot-disparo/client/dist;
+    index index.html;
+    try_files $uri $uri/ /disparos/index.html;
+
+    # Otimização de Cache para arquivos estáticos gerados pelo Vite (assets com hash)
+    location ~* \.(?:css|js|woff2?|eot|ttf|otf|ico|png|jpe?g|gif|webp|svg)$ {
+        expires 1y;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+        access_log off;
+    }
+}
+
+# 2. UPLOADS DIRETOS PELO NGINX: Alta performance para arquivos de mídia (imagens, áudios, vídeos)
+# Isso evita passar pelo Node.js, liberando CPU do backend e acelerando o envio.
+location /api-disparos/uploads/ {
+    alias /var/www/bot-disparo/server/uploads/;
+    expires 30d;
+    add_header Cache-Control "public, no-transform";
+    access_log off;
+    
+    # Previne execução de scripts maliciosos na pasta de uploads
+    location ~ \.(php|pl|py|jsp|sh|cgi)$ {
+        deny all;
+    }
+}
+
+# 3. BACKEND API: Proxy reverso para o servidor Node.js (PM2 na porta 5000)
+location /api-disparos/ {
+    # Remove o prefixo /api-disparos/ e encaminha como /api/ para o Express
+    rewrite ^/api-disparos/(.*) /api/$1 break;
+    
+    proxy_pass http://127.0.0.1:5000;
+    proxy_http_version 1.1;
+    
+    # Headers para WebSocket (se necessário) e informações de IP real do cliente
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    
+    # Ignora o cache para chamadas de API
+    proxy_cache_bypass $http_upgrade;
+    
+    # Configurações cruciais de limites para upload de planilhas e mídias pesadas (WhatsApp)
+    client_max_body_size 100M; 
+    
+    # Ajuste de timeouts para evitar erros de Gateway Timeout em disparos massivos
+    proxy_connect_timeout 90s;
+    proxy_send_timeout 90s;
+    proxy_read_timeout 90s;
+}
+
+
+# =========================================================================
+# OPÇÃO B: Bloco completo do servidor HTTPS (Se for rodar num subdomínio dedicado)
+# =========================================================================
+#
+# server {
+#     listen 80;
+#     server_name disparos.seudominio.com.br;
+#     return 301 https://$host$request_uri;
+# }
+#
+# server {
+#     listen 443 ssl http2;
+#     server_name disparos.seudominio.com.br;
+#
+#     ssl_certificate /etc/letsencrypt/live/disparos.seudominio.com.br/fullchain.pem;
+#     ssl_certificate_key /etc/letsencrypt/live/disparos.seudominio.com.br/privkey.pem;
+#     include /etc/letsencrypt/options-ssl-nginx.conf;
+#     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+#
+#     # Ativar compressão Gzip para carregamento super rápido do app
+#     gzip on;
+#     gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+#     gzip_proxied any;
+#     gzip_comp_level 6;
+#     gzip_min_length 256;
+#
+#     # Incluir os blocos das locations aqui...
+# }

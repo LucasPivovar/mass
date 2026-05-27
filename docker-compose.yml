@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: bot-disparo-redis
+    restart: always
+    ports:
+      - "127.0.0.1:6379:6379" # Exposes Redis strictly to localhost for host backend security
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+volumes:
+  redis_data:
