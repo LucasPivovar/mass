@@ -11,6 +11,8 @@ import Register from './pages/Register';
 import Financeiro from './pages/Financeiro';
 import ClientDashboard from './pages/ClientDashboard';
 import Sidebar from './components/Sidebar';
+import Flows from './pages/Flows';
+import FlowEditor from './pages/FlowEditor';
 import { Toaster } from 'react-hot-toast';
 import logoImage from './assets/logo_massflow.png';
 
@@ -32,6 +34,13 @@ function AppRoutes({ token, handleLogin, handleLogout, isSidebarOpen, setIsSideb
           success: { iconTheme: { primary: '#5EFF00', secondary: '#000' } },
         }}
       />
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media (min-width: 769px) {
+          .mobile-topbar {
+            display: none !important;
+          }
+        }
+      `}} />
       {!token ? (
         <Routes key={location.pathname}>
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
@@ -41,13 +50,11 @@ function AppRoutes({ token, handleLogin, handleLogout, isSidebarOpen, setIsSideb
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
           {/* Mobile Header Bar */}
-          <header className="mobile-topbar" style={{ position: 'relative' }}>
-            <button className="mobile-menu-btn" onClick={() => setIsSidebarOpen(true)} style={{ background: 'none', border: 'none', padding: '8px' }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          <header className="mobile-topbar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', padding: '0.75rem 1rem', height: '56px', boxSizing: 'border-box' }}>
+            <button className="mobile-menu-btn" onClick={() => setIsSidebarOpen(true)} style={{ background: 'none', border: 'none', padding: '8px', position: 'absolute', left: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
-            <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', display: 'flex', alignItems: 'center' }}>
-              <img src={logoImage} alt="MassFlow Logo" style={{ height: '24px', width: 'auto', objectFit: 'contain' }} />
-            </div>
+            <img src={logoImage} alt="MassFlow Logo" style={{ height: '24px', width: 'auto', objectFit: 'contain' }} />
           </header>
 
           {/* Drawer Backdrop click listener overlay */}
@@ -65,6 +72,8 @@ function AppRoutes({ token, handleLogin, handleLogout, isSidebarOpen, setIsSideb
                 <Route path="/reports" element={<Reports token={token} />} />
                 <Route path="/settings" element={<Settings token={token} />} />
                 <Route path="/financial" element={<Financeiro token={token} />} />
+                <Route path="/flows" element={<Flows token={token} />} />
+                <Route path="/flows/:platform" element={<FlowEditor token={token} setIsSidebarOpen={setIsSidebarOpen} />} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </main>

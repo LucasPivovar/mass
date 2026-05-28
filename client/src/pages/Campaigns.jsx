@@ -8,10 +8,9 @@ const Campaigns = ({ token }) => {
   const navigate = useNavigate();
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-  // Modal state
+
   const [selectedCampaign, setSelectedCampaign] = useState(null);
-  
+
   // Actions Ellipsis Dropdown state
   const [activeDropdownId, setActiveDropdownId] = useState(null);
 
@@ -94,7 +93,7 @@ const Campaigns = ({ token }) => {
     if (newStatus === 'paused') verb = 'pausar';
     if (newStatus === 'stopped') verb = 'parar ou cancelar';
     if (newStatus === 'sending') verb = 'retomar';
-    
+
     if (!window.confirm(`Deseja realmente ${verb} a campanha "${c.name}"?`)) return;
     try {
       await axios.post(`${API_BASE}/api/campaigns/${c.id}/status`, { status: newStatus }, {
@@ -119,9 +118,9 @@ const Campaigns = ({ token }) => {
         );
       case 'sending':
         return (
-          <span className="badge" style={{ 
-            background: 'rgba(16, 185, 129, 0.15)', 
-            color: '#34d399', 
+          <span className="badge" style={{
+            background: 'rgba(16, 185, 129, 0.15)',
+            color: '#34d399',
             border: '1px solid rgba(16, 185, 129, 0.3)',
             animation: 'pulseGlow 2s infinite ease-in-out',
             whiteSpace: 'nowrap'
@@ -134,9 +133,9 @@ const Campaigns = ({ token }) => {
         );
       case 'scheduled':
         return (
-          <span className="badge" style={{ 
-            background: 'rgba(255, 255, 255, 0.08)', 
-            color: '#ffffff', 
+          <span className="badge" style={{
+            background: 'rgba(255, 255, 255, 0.08)',
+            color: '#ffffff',
             border: '1px solid rgba(255, 255, 255, 0.15)',
             whiteSpace: 'nowrap'
           }} title={`Agendado para ${date} às ${time}`}>
@@ -179,7 +178,7 @@ const Campaigns = ({ token }) => {
       if (Object.keys(vars).length === 0) return <em style={{ color: 'var(--text-tertiary)' }}>Nenhuma variável configurada</em>;
       return Object.entries(vars).map(([key, val]) => (
         <div key={key} style={{ marginBottom: '8px', fontSize: '0.85rem', display: 'flex', gap: '6px' }}>
-          <strong style={{ color: 'var(--accent-secondary)' }}>{`{{${key}}}`}:</strong> 
+          <strong style={{ color: 'var(--accent-secondary)' }}>{`{{${key}}}`}:</strong>
           <span style={{ color: 'var(--text-primary)' }}>{val}</span>
         </div>
       ));
@@ -208,7 +207,7 @@ const Campaigns = ({ token }) => {
         <div style={styles.statCard}>
           <div style={styles.statIconContainer}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+              <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
             </svg>
           </div>
           <div>
@@ -256,9 +255,9 @@ const Campaigns = ({ token }) => {
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input 
-            type="text" 
-            placeholder="Buscar campanha..." 
+          <input
+            type="text"
+            placeholder="Buscar campanha..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="no-border-input"
@@ -266,7 +265,7 @@ const Campaigns = ({ token }) => {
           />
         </div>
         <div style={styles.filterInputGroup}>
-          <select 
+          <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="no-border-select"
@@ -307,9 +306,9 @@ const Campaigns = ({ token }) => {
                     {c.name}
                     {c.contact_flag && (
                       <div style={{ marginTop: '5px' }}>
-                        <span className="badge" style={{ 
-                          background: 'rgba(16, 185, 129, 0.08)', 
-                          color: '#34d399', 
+                        <span className="badge" style={{
+                          background: 'rgba(16, 185, 129, 0.08)',
+                          color: '#34d399',
                           border: '1px solid rgba(16, 185, 129, 0.2)',
                           fontSize: '0.72rem',
                           padding: '2px 8px',
@@ -327,10 +326,10 @@ const Campaigns = ({ token }) => {
                   </td>
                   <td>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <span 
-                        style={{ 
-                          fontSize: '0.75rem', 
-                          padding: '0.3rem 0.8rem', 
+                      <span
+                        style={{
+                          fontSize: '0.75rem',
+                          padding: '0.3rem 0.8rem',
                           borderRadius: '99px',
                           background: c.template_sid ? 'var(--accent-indigo-light)' : 'rgba(255, 255, 255, 0.05)',
                           color: c.template_sid ? '#a7f3d0' : 'var(--text-secondary)',
@@ -384,8 +383,8 @@ const Campaigns = ({ token }) => {
                   </td>
                   <td style={{ textAlign: 'center' }}>
                     <div className="actions-dropdown-container">
-                      <button 
-                        onClick={(e) => toggleDropdown(c.id, e)} 
+                      <button
+                        onClick={(e) => toggleDropdown(c.id, e)}
                         className="actions-dropdown-trigger"
                         title="Ações da Campanha"
                       >
@@ -395,10 +394,10 @@ const Campaigns = ({ token }) => {
                           <circle cx="12" cy="19" r="1.5"></circle>
                         </svg>
                       </button>
-                      
+
                       {activeDropdownId === c.id && (
                         <div className="actions-dropdown-menu" onClick={(e) => e.stopPropagation()}>
-                          <button 
+                          <button
                             onClick={() => { setSelectedCampaign(c); setActiveDropdownId(null); }}
                             className="actions-dropdown-item"
                           >
@@ -408,11 +407,11 @@ const Campaigns = ({ token }) => {
                             </svg>
                             Ver Mensagem
                           </button>
-                          
+
                           {/* Conditional control buttons for Pause, Stop, Resume */}
                           {c.status === 'sending' && (
                             <>
-                              <button 
+                              <button
                                 onClick={() => { handleUpdateStatus(c, 'paused'); setActiveDropdownId(null); }}
                                 className="actions-dropdown-item warning"
                                 style={{ color: '#f59e0b' }}
@@ -423,7 +422,7 @@ const Campaigns = ({ token }) => {
                                 </svg>
                                 Pausar
                               </button>
-                              <button 
+                              <button
                                 onClick={() => { handleUpdateStatus(c, 'stopped'); setActiveDropdownId(null); }}
                                 className="actions-dropdown-item danger"
                               >
@@ -434,10 +433,10 @@ const Campaigns = ({ token }) => {
                               </button>
                             </>
                           )}
-                          
+
                           {c.status === 'paused' && (
                             <>
-                              <button 
+                              <button
                                 onClick={() => { handleUpdateStatus(c, 'sending'); setActiveDropdownId(null); }}
                                 className="actions-dropdown-item success"
                               >
@@ -446,7 +445,7 @@ const Campaigns = ({ token }) => {
                                 </svg>
                                 Retomar
                               </button>
-                              <button 
+                              <button
                                 onClick={() => { handleUpdateStatus(c, 'stopped'); setActiveDropdownId(null); }}
                                 className="actions-dropdown-item danger"
                               >
@@ -459,7 +458,7 @@ const Campaigns = ({ token }) => {
                           )}
 
                           {c.status === 'scheduled' && (
-                            <button 
+                            <button
                               onClick={() => { handleUpdateStatus(c, 'stopped'); setActiveDropdownId(null); }}
                               className="actions-dropdown-item danger"
                             >
@@ -470,7 +469,7 @@ const Campaigns = ({ token }) => {
                             </button>
                           )}
 
-                          <button 
+                          <button
                             onClick={() => { handleResend(c); setActiveDropdownId(null); }}
                             className="actions-dropdown-item"
                           >
@@ -495,12 +494,12 @@ const Campaigns = ({ token }) => {
               )}
             </tbody>
           </table>
-          
+
           {/* Pagination Controls */}
           {campaigns.length > campaignsPerPage && (
             <div style={styles.paginationContainer}>
-              <button 
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
                 className="secondary"
                 style={styles.paginationBtn}
@@ -510,8 +509,8 @@ const Campaigns = ({ token }) => {
               <span style={styles.paginationInfo}>
                 Página {currentPage} de {totalPages}
               </span>
-              <button 
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages}
                 className="secondary"
                 style={styles.paginationBtn}
@@ -528,17 +527,17 @@ const Campaigns = ({ token }) => {
         <div className="modal-overlay" style={styles.modalOverlay}>
           <div className="modal-content-box" style={styles.modalContent}>
             {/* Fechar modal */}
-            <button 
+            <button
               onClick={() => setSelectedCampaign(null)}
               style={styles.closeBtn}
             >
               ✕
             </button>
-            
+
             <h2 style={{ marginTop: 0, fontSize: '1.4rem', borderBottom: '1px solid var(--border-glass)', paddingBottom: '0.75rem', marginBottom: '1.5rem' }}>
               Detalhes da Campanha
             </h2>
-            
+
             <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
               {/* Campaign details */}
               <div style={{ flex: 1, minWidth: '220px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -546,16 +545,16 @@ const Campaigns = ({ token }) => {
                   <label style={styles.detailLabel}>Nome da Campanha</label>
                   <p style={styles.detailText}>{selectedCampaign.name}</p>
                 </div>
-                
+
                 <div>
                   <label style={styles.detailLabel}>Provedor Utilizado</label>
                   <p style={styles.detailText}>
-                    {selectedCampaign.template_sid 
-                      ? `Twilio (${selectedCampaign.twilio_account_name || 'WhatsApp Oficial'})` 
+                    {selectedCampaign.template_sid
+                      ? `Twilio (${selectedCampaign.twilio_account_name || 'WhatsApp Oficial'})`
                       : 'Padrão (WhatsApp Web)'}
                   </p>
                 </div>
-                
+
                 {selectedCampaign.template_sid && (
                   <div style={styles.variableBox}>
                     <label style={styles.detailLabel}>Variáveis Declaradas</label>
@@ -565,7 +564,7 @@ const Campaigns = ({ token }) => {
                   </div>
                 )}
               </div>
-              
+
               {/* Phone Mockup Preview */}
               <div style={{ width: '280px', flexShrink: 0 }}>
                 <div style={styles.miniPhone}>
@@ -577,7 +576,7 @@ const Campaigns = ({ token }) => {
                         <div style={{ fontSize: '10px', opacity: 0.8 }}>online</div>
                       </div>
                     </div>
-                    
+
                     <div style={styles.miniBody}>
                       <div className="whatsapp-message-bubble" style={{ alignSelf: 'flex-end', fontSize: '0.82rem', padding: '8px 12px', borderRadius: '12px', borderTopRightRadius: '2px' }}>
                         {selectedCampaign.template_sid ? (
