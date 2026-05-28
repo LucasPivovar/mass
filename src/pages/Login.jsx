@@ -352,9 +352,6 @@ const Login = ({ onLogin }) => {
           </div>
         )}
 
-        <div style={styles.footer}>
-          <span>Acesso seguro & criptografado offline</span>
-        </div>
       </div>
     </div>
   );
@@ -369,36 +366,16 @@ const styles = {
     minHeight: '100vh',
     padding: '1.5rem',
     boxSizing: 'border-box',
-    background: 'radial-gradient(circle at 50% 20%, #040503 0%, #000000 100%)',
+    background: '#000000',
     position: 'relative',
     overflowY: 'auto',
     overflowX: 'hidden'
   },
   glowBlob1: {
-    position: 'absolute',
-    width: '500px',
-    height: '500px',
-    borderRadius: '50%',
-    background: 'rgba(94, 255, 0, 0.03)',
-    filter: 'blur(120px)',
-    top: '0%',
-    left: '-5%',
-    pointerEvents: 'none',
-    animation: 'blobFloat 15s infinite ease-in-out alternate',
-    zIndex: 1
+    display: 'none'
   },
   glowBlob2: {
-    position: 'absolute',
-    width: '500px',
-    height: '500px',
-    borderRadius: '50%',
-    background: 'rgba(63, 168, 0, 0.025)',
-    filter: 'blur(130px)',
-    bottom: '0%',
-    right: '-5%',
-    pointerEvents: 'none',
-    animation: 'blobFloat 18s infinite ease-in-out alternate-reverse',
-    zIndex: 1
+    display: 'none'
   },
   authContainer: {
     background: 'rgba(4, 5, 3, 0.97)',
@@ -454,7 +431,7 @@ const styles = {
     textAlign: 'left'
   },
   label: {
-    color: '#9CA3AF',
+    color: '#ffffff',
     fontSize: '0.8rem',
     fontWeight: '700',
     letterSpacing: '0.05em'
@@ -477,10 +454,10 @@ const styles = {
     padding: '1rem 2rem',
     fontSize: '0.95rem',
     fontWeight: '700',
-    background: 'linear-gradient(135deg, #5EFF00 0%, #3FA800 100%)',
+    background: '#59e308',
     color: '#000',
     border: 'none',
-    boxShadow: '0 8px 28px rgba(94,255,0,0.28)',
+    boxShadow: 'none',
     cursor: 'pointer',
     marginTop: '0.5rem',
     letterSpacing: '-0.01em'

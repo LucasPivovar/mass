@@ -91,6 +91,11 @@ const SLabel = ({ children }) => (
 
 /* ─── Line Chart ───────────────────────────────────────────────────── */
 const LineChart = () => {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [hov, setHov] = useState(null);
   const vals = LINE_DATA.map(d => d.value);
   const mn   = Math.min(...vals) * 0.82;
@@ -101,7 +106,7 @@ const LineChart = () => {
 
   return (
     <div style={{ position:'relative', width:'100%' }}>
-      <svg viewBox="0 0 500 148" width="100%" height="170" style={{ overflow:'visible', display:'block' }}>
+      <svg key={mounted ? 'mounted' : 'initial'} viewBox="0 0 500 148" width="100%" height="170" style={{ overflow:'visible', display:'block' }}>
         <defs>
           <linearGradient id="lc-stroke" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor={B.lime}  />
@@ -195,18 +200,15 @@ const LineChart = () => {
 
 /* ─── Campaign Bars ────────────────────────────────────────────────── */
 const CampaignBars = () => {
-  const [hov, setHov] = useState(null);
   const [mounted, setMounted] = useState(false);
   useEffect(() => { const t = setTimeout(() => setMounted(true), 100); return () => clearTimeout(t); }, []);
 
   return (
-    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'2px', borderRadius:'10px', overflow:'hidden', background:'rgba(94,255,0,0.03)', marginTop:'1rem' }}>
+    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'2px', borderRadius:'10px', overflow:'hidden', background:'transparent', marginTop:'1rem' }}>
       {BAR_DATA.map((d, i) => (
         <div key={i}
-          onMouseEnter={() => setHov(i)}
-          onMouseLeave={() => setHov(null)}
-          style={{ padding:'1rem 1.1rem', background: hov===i ? 'rgba(94,255,0,0.05)' : 'rgba(8,13,5,0.6)', transition:'background 0.2s ease', cursor:'default' }}>
-          <p style={{ fontSize:'0.7rem', fontWeight:'700', color: hov===i ? B.muted : B.subtle, textTransform:'uppercase', letterSpacing:'0.06em', margin:'0 0 0.75rem 0', transition:'color 0.2s' }}>
+          style={{ padding:'1rem 1.1rem', background: 'transparent' }}>
+          <p style={{ fontSize:'0.7rem', fontWeight:'700', color: B.subtle, textTransform:'uppercase', letterSpacing:'0.06em', margin:'0 0 0.75rem 0' }}>
             {d.label}
           </p>
           {/* Entregue */}
@@ -317,14 +319,14 @@ const Dashboard = ({ token }) => {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <p style={{ fontSize:'0.7rem', fontWeight:'700', color:B.subtle, textTransform:'uppercase', letterSpacing:'0.07em', margin:'0 0 0.3rem 0' }}>{k.label}</p>
-                  <p style={{ fontSize:'2rem', fontWeight:'800', color:B.text, letterSpacing:'-0.03em', margin:0, lineHeight:1 }}>{k.value}</p>
+                  <p style={{ fontSize:'2rem', fontWeight:'800', color:'#ffffff', letterSpacing:'-0.03em', margin:0, lineHeight:1 }}>{k.value}</p>
                 </div>
                 <div style={{ width:'48px', height:'48px', borderRadius:'13px', background:k.bg, display:'flex', alignItems:'center', justifyContent:'center', border:`1px solid rgba(94,255,0,0.1)` }}>
                   {getIcon(k.iconType, k.iconColor)}
                 </div>
               </div>
-              <p style={{ fontSize:'0.74rem', color:'rgba(107,114,128,0.8)', margin:0, fontWeight:'500' }}>
-                <span style={{ color: k.badgeOk ? B.lime : '#ef4444', fontWeight:'700' }}>{k.badge}</span>{' '}{k.detail}
+              <p style={{ fontSize:'0.74rem', color:'#ffffff', margin:0, fontWeight:'500' }}>
+                <span style={{ color: '#ffffff', fontWeight:'500' }}>{k.badge}</span>{' '}{k.detail}
               </p>
             </Card>
           ))}
@@ -370,7 +372,7 @@ const Dashboard = ({ token }) => {
             <p style={{ fontSize:'0.82rem', color:B.muted, lineHeight:1.65, margin:0 }}>
               Carregue sua lista de leads via Excel ou CSV para iniciar seus fluxos de disparo.
             </p>
-            <button onClick={() => navigate('/contacts')} className="secondary" style={{ padding:'0.6rem 1rem', fontSize:'0.82rem', fontWeight:'600', borderRadius:'8px', width:'100%', display:'inline-flex', alignItems:'center', justifyContent: 'center', gap:'6px', marginTop:'auto' }}>
+            <button onClick={() => navigate('/contacts')} className="secondary" style={{ padding:'0.6rem 1.5rem', fontSize:'0.82rem', fontWeight:'600', borderRadius:'8px', width:'fit-content', display:'inline-flex', alignItems:'center', justifyContent: 'center', gap:'6px', marginTop:'auto' }}>
               Gerenciar Contatos
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </button>
@@ -392,7 +394,7 @@ const Dashboard = ({ token }) => {
             <p style={{ fontSize:'0.82rem', color:B.muted, lineHeight:1.65, margin:0 }}>
               Monte um novo fluxo de mensagens com variáveis, mídias e segmentação de leads.
             </p>
-            <button onClick={() => navigate('/new-campaign')} style={{ width:'100%', marginTop:'auto', display:'inline-flex', alignItems:'center', justifyContent:'center', gap:'6px' }}>
+            <button onClick={() => navigate('/new-campaign')} style={{ width:'fit-content', padding:'0.6rem 1.5rem', fontSize:'0.82rem', fontWeight:'600', borderRadius:'8px', marginTop:'auto', display:'inline-flex', alignItems:'center', justifyContent:'center', gap:'6px' }}>
               Criar Campanha
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 16 14"/></svg>
             </button>

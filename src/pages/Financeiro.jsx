@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Financeiro = () => {
   // Dados simulados
@@ -7,12 +7,40 @@ const Financeiro = () => {
   const [plan] = useState('Plano Pro (100k Disparos)');
   const [renewalDate] = useState('15/10/2026');
 
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 3;
+
   const transactions = [
     { id: 1, date: '10/08/2026', description: 'Recarga de Créditos (Twilio)', amount: -500.00, status: 'Concluído' },
     { id: 2, date: '01/08/2026', description: 'Assinatura Mensal MassFlow', amount: -299.90, status: 'Concluído' },
     { id: 3, date: '28/07/2026', description: 'Bônus Promocional', amount: 150.00, status: 'Creditado' },
-    { id: 4, date: '15/07/2026', description: 'Recarga de Créditos (Twilio)', amount: -500.00, status: 'Concluído' }
+    { id: 4, date: '15/07/2026', description: 'Recarga de Créditos (Twilio)', amount: -500.00, status: 'Concluído' },
+    { id: 5, date: '10/07/2026', description: 'Estorno de Envio Com Erro', amount: 45.80, status: 'Creditado' },
+    { id: 6, date: '01/07/2026', description: 'Assinatura Mensal MassFlow', amount: -299.90, status: 'Concluído' },
+    { id: 7, date: '18/06/2026', description: 'Recarga de Créditos (Twilio)', amount: -250.00, status: 'Concluído' }
   ];
+
+  // Filtering transactions
+  const filteredTransactions = transactions.filter(t => {
+    const descMatch = t.description.toLowerCase().includes(search.toLowerCase());
+    const statusMatch = !statusFilter || t.status === statusFilter;
+    return descMatch && statusMatch;
+  });
+
+  // Calculate total pages
+  const totalPages = Math.max(Math.ceil(filteredTransactions.length / itemsPerPage), 1);
+
+  // Reset to page 1 on filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, statusFilter]);
+
+  const paginatedTransactions = filteredTransactions.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div className="page-container pulse-glow">
@@ -97,21 +125,54 @@ const Financeiro = () => {
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '3rem', flexWrap: 'wrap', width: '100%' }}>
-        <button style={{ flex: 1, width: '100%', minWidth: '220px' }}>
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '3rem', flexWrap: 'wrap' }}>
+        <button style={{ width: 'fit-content' }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
           </svg>
           Adicionar Créditos
         </button>
-        <button className="secondary" style={{ flex: 1, width: '100%', minWidth: '220px' }}>
+        <button className="secondary" style={{ width: 'fit-content' }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
           Baixar Relatório Fiscal
         </button>
       </div>
 
-      <h2 style={{ fontSize: '1.4rem', marginBottom: '1.25rem' }}>Histórico de Transações</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '1rem' }}>
+        <h2 style={{ fontSize: '1.4rem', margin: 0 }}>Histórico de Transações</h2>
+        
+        {/* Filters Section */}
+        <div style={styles.filterSection}>
+          <div style={styles.filterInputGroup}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input 
+              type="text" 
+              placeholder="Buscar transações..." 
+              value={search} 
+              onChange={(e) => setSearch(e.target.value)} 
+              className="no-border-input"
+              style={styles.searchInput}
+            />
+          </div>
+
+          <div style={styles.filterInputGroup}>
+            <select 
+              value={statusFilter} 
+              onChange={(e) => setStatusFilter(e.target.value)} 
+              className="no-border-select"
+              style={styles.selectFilter}
+            >
+              <option value="">Status: Todos</option>
+              <option value="Concluído">Concluído</option>
+              <option value="Creditado">Creditado</option>
+            </select>
+          </div>
+        </div>
+      </div>
       
       <div className="table-container">
         <table>
@@ -124,7 +185,7 @@ const Financeiro = () => {
             </tr>
           </thead>
           <tbody>
-            {transactions.map(t => (
+            {paginatedTransactions.map(t => (
               <tr key={t.id}>
                 <td style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{t.date}</td>
                 <td style={{ fontWeight: '600' }}>{t.description}</td>
@@ -138,17 +199,49 @@ const Financeiro = () => {
                 </td>
                 <td>
                   <span className="badge" style={{ 
-                    background: t.status === 'Concluído' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(59, 130, 246, 0.15)',
-                    color: t.status === 'Concluído' ? '#34d399' : '#60a5fa',
-                    border: t.status === 'Concluído' ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(59, 130, 246, 0.3)'
+                    background: t.status === 'Concluído' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 255, 255, 0.08)',
+                    color: t.status === 'Concluído' ? '#34d399' : '#ffffff',
+                    border: t.status === 'Concluído' ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(255, 255, 255, 0.15)'
                   }}>
                     {t.status}
                   </span>
                 </td>
               </tr>
             ))}
+            {filteredTransactions.length === 0 && (
+              <tr>
+                <td colSpan="4" style={{ textAlign: 'center', padding: '3rem 2rem', color: 'var(--text-secondary)' }}>
+                  Nenhuma transação encontrada para o filtro atual.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
+
+        {/* Pagination Controls */}
+        {filteredTransactions.length > 0 && (
+          <div style={styles.paginationContainer}>
+            <button 
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+              disabled={currentPage === 1}
+              className="secondary"
+              style={styles.paginationBtn}
+            >
+              Anterior
+            </button>
+            <span style={styles.paginationInfo}>
+              Página {currentPage} de {totalPages}
+            </span>
+            <button 
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+              disabled={currentPage === totalPages}
+              className="secondary"
+              style={styles.paginationBtn}
+            >
+              Próxima
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -197,6 +290,60 @@ const styles = {
     fontWeight: '800',
     color: 'white',
     letterSpacing: '-0.02em'
+  },
+  filterSection: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.75rem'
+  },
+  filterInputGroup: {
+    display: 'flex',
+    alignItems: 'center',
+    background: 'rgba(15, 23, 42, 0.45)',
+    border: '1px solid var(--border-glass)',
+    borderRadius: '8px',
+    padding: '0.4rem 0.75rem',
+    minWidth: '180px'
+  },
+  searchInput: {
+    border: 'none',
+    background: 'transparent',
+    color: 'var(--text-primary)',
+    outline: 'none',
+    width: '100%',
+    padding: '0.15rem 0.25rem',
+    fontSize: '0.85rem'
+  },
+  selectFilter: {
+    border: 'none',
+    background: 'transparent',
+    color: 'var(--text-primary)',
+    outline: 'none',
+    width: '100%',
+    cursor: 'pointer',
+    fontSize: '0.85rem',
+    padding: '0.15rem 0'
+  },
+  paginationContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: '1.25rem',
+    padding: '1rem',
+    borderTop: '1px solid var(--border-glass)',
+    background: 'rgba(10, 15, 30, 0.2)'
+  },
+  paginationBtn: {
+    padding: '0.45rem 1.15rem',
+    fontSize: '0.82rem',
+    borderRadius: '8px',
+    boxShadow: 'none',
+    minWidth: '90px'
+  },
+  paginationInfo: {
+    fontSize: '0.85rem',
+    color: 'var(--text-secondary)',
+    fontWeight: '600'
   }
 };
 

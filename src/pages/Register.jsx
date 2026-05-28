@@ -13,14 +13,21 @@ const Register = ({ onLogin }) => {
 
   // Step 1 data
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [phone, setPhone] = useState('');
+  const [cpf, setCpf] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  // Step 2 & 3 data
-  const [emailCode, setEmailCode] = useState('');
+  // Step 2 data
+  const [phone, setPhone] = useState('');
   const [phoneCode, setPhoneCode] = useState('');
+  const [phoneCodeSent, setPhoneCodeSent] = useState(false);
+  const [sendingSms, setSendingSms] = useState(false);
+
+  // Step 3 data
+  const [email, setEmail] = useState('');
+  const [emailCode, setEmailCode] = useState('');
+  const [emailCodeSent, setEmailCodeSent] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   // Dummy token for final login
   const [tempToken, setTempToken] = useState('');
@@ -30,10 +37,10 @@ const Register = ({ onLogin }) => {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.post(`${API_BASE}/api/register`, { username: name, password });
+      const response = await axios.post(`${API_BASE}/api/register`, { username: name, password, cpf });
       setTempToken(response.data.token);
       setStep(2);
-      toast.success('Cadastro inicial realizado. Um código foi enviado para seu e-mail.');
+      toast.success('Cadastro inicial realizado! Agora insira seu telefone.');
     } catch (err) {
       setError(err.response?.data?.message || 'Erro ao realizar o cadastro. Tente novamente.');
     } finally {
@@ -41,24 +48,55 @@ const Register = ({ onLogin }) => {
     }
   };
 
+  const handleSendSmsCode = async (e) => {
+    e.preventDefault();
+    setSendingSms(true);
+    setError('');
+    try {
+      // Simulating SMS code sending
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setPhoneCodeSent(true);
+      toast.success('Código SMS de teste enviado: 123456');
+    } catch (err) {
+      setError('Erro ao enviar SMS. Tente novamente.');
+    } finally {
+      setSendingSms(false);
+    }
+  };
+
   const handleStep2Submit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    setSuccess('');
     try {
-      // Simulating email 2FA verification
+      // Simulating SMS code verification
       await new Promise(resolve => setTimeout(resolve, 800));
-      if (emailCode.length === 6) {
+      if (phoneCode.length === 6) {
         setStep(3);
-        toast.success('E-mail verificado! Enviamos agora um código SMS para o seu celular.');
+        toast.success('Telefone verificado! Agora insira seu e-mail.');
       } else {
-        setError('Código inválido. Digite os 6 dígitos.');
+        setError('Código SMS inválido. Digite 6 dígitos.');
       }
     } catch (err) {
-      setError('Erro ao verificar código de e-mail.');
+      setError('Erro ao verificar código SMS.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSendEmailCode = async (e) => {
+    e.preventDefault();
+    setSendingEmail(true);
+    setError('');
+    try {
+      // Simulating sending email code
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setEmailCodeSent(true);
+      toast.success('Código de verificação enviado! Código de teste: 123456');
+    } catch (err) {
+      setError('Erro ao enviar código para o e-mail. Tente novamente.');
+    } finally {
+      setSendingEmail(false);
     }
   };
 
@@ -66,19 +104,17 @@ const Register = ({ onLogin }) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    setSuccess('');
     try {
-      // Simulating phone 2FA verification
+      // Simulating email code verification
       await new Promise(resolve => setTimeout(resolve, 800));
-      if (phoneCode.length === 6) {
+      if (emailCode.length === 6) {
         toast.success('Cadastro concluído com sucesso!');
-        // Success! Log the user in
-        onLogin(tempToken);
+        onLogin(tempToken || 'mock-token-xyz');
       } else {
-        setError('Código inválido. Digite os 6 dígitos.');
+        setError('Código de e-mail inválido. Digite 6 dígitos.');
       }
     } catch (err) {
-      setError('Erro ao verificar código SMS.');
+      setError('Erro ao verificar e-mail.');
     } finally {
       setLoading(false);
     }
@@ -118,10 +154,10 @@ const Register = ({ onLogin }) => {
             }} />
           ))}
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem', fontSize: '0.75rem', color: 'var(--text-tertiary)', fontWeight: '600', padding: '0 5px' }}>
-          <span style={{ flex: 1, textAlign: 'center', color: step >= 1 ? '#5EFF00' : 'inherit' }}>Dados</span>
-          <span style={{ flex: 1, textAlign: 'center', color: step >= 2 ? '#5EFF00' : 'inherit' }}>E-mail</span>
-          <span style={{ flex: 1, textAlign: 'center', color: step >= 3 ? '#5EFF00' : 'inherit' }}>Celular</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem', fontSize: '0.73rem', color: 'var(--text-tertiary)', fontWeight: '600', padding: '0 5px' }}>
+          <span style={{ flex: 1, textAlign: 'center', color: step >= 1 ? '#5EFF00' : 'inherit' }}>Acesso</span>
+          <span style={{ flex: 1, textAlign: 'center', color: step >= 2 ? '#5EFF00' : 'inherit' }}>Celular</span>
+          <span style={{ flex: 1, textAlign: 'center', color: step >= 3 ? '#5EFF00' : 'inherit' }}>E-mail</span>
         </div>
 
         {success && <p className="success-message" style={styles.success}>{success}</p>}
@@ -151,44 +187,32 @@ const Register = ({ onLogin }) => {
             </div>
 
             <div className="input-group" style={{ marginBottom: '1.25rem' }}>
-              <label style={styles.label}>E-mail</label>
+              <label style={styles.label}>CPF</label>
               <div style={{ position: 'relative' }}>
                 <span style={styles.inputIcon}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                    <polyline points="22,6 12,13 2,6"></polyline>
+                    <rect x="3" y="4" width="18" height="16" rx="2" ry="2"></rect>
+                    <line x1="7" y1="8" x2="17" y2="8"></line>
+                    <line x1="7" y1="12" x2="11" y2="12"></line>
+                    <line x1="7" y1="16" x2="13" y2="16"></line>
                   </svg>
                 </span>
                 <input 
-                  type="email" 
-                  value={email} 
-                  onChange={(e) => setEmail(e.target.value)} 
-                  placeholder="seu@email.com"
-                  style={{ ...styles.input, paddingLeft: '2.8rem' }}
-                  required 
-                />
-              </div>
-            </div>
-
-            <div className="input-group" style={{ marginBottom: '1.25rem' }}>
-              <label style={styles.label}>Celular</label>
-              <div style={{ position: 'relative' }}>
-                <span style={styles.inputIcon}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 .7 2.81A2 2 0 0 1 22 16.92z"></path>
-                  </svg>
-                </span>
-                <input 
-                  type="tel" 
-                  value={phone} 
+                  type="text" 
+                  value={cpf} 
                   onChange={(e) => {
                     let v = e.target.value.replace(/\D/g, '');
                     if (v.length > 11) v = v.slice(0, 11);
-                    if (v.length > 2) v = `(${v.slice(0, 2)}) ${v.slice(2)}`;
-                    if (v.length > 10) v = `${v.slice(0, 10)}-${v.slice(10)}`;
-                    setPhone(v);
+                    if (v.length > 9) {
+                      v = `${v.slice(0, 3)}.${v.slice(3, 6)}.${v.slice(6, 9)}-${v.slice(9)}`;
+                    } else if (v.length > 6) {
+                      v = `${v.slice(0, 3)}.${v.slice(3, 6)}.${v.slice(6)}`;
+                    } else if (v.length > 3) {
+                      v = `${v.slice(0, 3)}.${v.slice(3)}`;
+                    }
+                    setCpf(v);
                   }} 
-                  placeholder="(11) 90000-0000"
+                  placeholder="000.000.000-00"
                   style={{ ...styles.input, paddingLeft: '2.8rem' }}
                   required 
                 />
@@ -254,59 +278,134 @@ const Register = ({ onLogin }) => {
         )}
 
         {step === 2 && (
-          <form onSubmit={handleStep2Submit} style={styles.form}>
-            <div className="input-group" style={{ marginBottom: '2rem', textAlign: 'center' }}>
-              <label style={{ ...styles.label, textAlign: 'center' }}>Código de E-mail</label>
+          <form onSubmit={phoneCodeSent ? handleStep2Submit : handleSendSmsCode} style={styles.form}>
+            
+            <div className="input-group" style={{ marginBottom: '1.25rem' }}>
+              <label style={styles.label}>Celular</label>
               <div style={{ position: 'relative' }}>
+                <span style={styles.inputIcon}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 .7 2.81A2 2 0 0 1 22 16.92z"></path>
+                  </svg>
+                </span>
                 <input 
-                  type="text" 
-                  className="input-2fa"
-                  value={emailCode} 
-                  onChange={(e) => setEmailCode(e.target.value.replace(/\D/g, '').slice(0, 6))} 
-                  placeholder="000000"
+                  type="tel" 
+                  value={phone} 
+                  onChange={(e) => {
+                    let v = e.target.value.replace(/\D/g, '');
+                    if (v.length > 11) v = v.slice(0, 11);
+                    if (v.length > 2) v = `(${v.slice(0, 2)}) ${v.slice(2)}`;
+                    if (v.length > 10) v = `${v.slice(0, 10)}-${v.slice(10)}`;
+                    setPhone(v);
+                  }} 
+                  placeholder="(11) 90000-0000"
+                  style={{ ...styles.input, paddingLeft: '2.8rem' }}
+                  disabled={phoneCodeSent}
                   required 
                 />
               </div>
-              <small style={{ color: 'var(--text-tertiary)', display: 'block', marginTop: '10px', textAlign: 'center' }}>
-                Enviamos um código de 6 dígitos para {email || 'seu e-mail'}.
-              </small>
             </div>
+
+            {phoneCodeSent && (
+              <div className="input-group" style={{ marginBottom: '2rem', textAlign: 'center' }}>
+                <label style={{ ...styles.label, textAlign: 'center' }}>Código SMS (6 dígitos)</label>
+                <div style={{ position: 'relative' }}>
+                  <input 
+                    type="text" 
+                    className="input-2fa"
+                    value={phoneCode} 
+                    onChange={(e) => setPhoneCode(e.target.value.replace(/\D/g, '').slice(0, 6))} 
+                    placeholder="000000"
+                    required 
+                  />
+                </div>
+                <small style={{ color: 'var(--text-tertiary)', display: 'block', marginTop: '10px', textAlign: 'center' }}>
+                  Insira o código enviado para o seu celular.
+                </small>
+              </div>
+            )}
             
-            <button type="submit" disabled={loading} style={styles.button}>
-              {loading ? 'Verificando...' : 'Verificar E-mail'}
+            <button type="submit" disabled={loading || sendingSms} style={styles.button}>
+              {sendingSms ? 'Enviando Código...' : loading ? 'Verificando...' : phoneCodeSent ? 'Avançar para o E-mail' : 'Enviar Código SMS'}
             </button>
             <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-              <button type="button" onClick={() => setStep(1)} style={styles.forgotLink}>
-                Voltar e editar dados
+              <button 
+                type="button" 
+                onClick={() => {
+                  if (phoneCodeSent) {
+                    setPhoneCodeSent(false);
+                    setPhoneCode('');
+                  } else {
+                    setStep(1);
+                  }
+                }} 
+                style={styles.forgotLink}
+              >
+                Voltar
               </button>
             </div>
           </form>
         )}
 
         {step === 3 && (
-          <form onSubmit={handleStep3Submit} style={styles.form}>
-            <div className="input-group" style={{ marginBottom: '2rem', textAlign: 'center' }}>
-              <label style={{ ...styles.label, textAlign: 'center' }}>Código SMS</label>
+          <form onSubmit={emailCodeSent ? handleStep3Submit : handleSendEmailCode} style={styles.form}>
+
+            <div className="input-group" style={{ marginBottom: '1.25rem' }}>
+              <label style={styles.label}>E-mail</label>
               <div style={{ position: 'relative' }}>
+                <span style={styles.inputIcon}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                  </svg>
+                </span>
                 <input 
-                  type="text" 
-                  className="input-2fa"
-                  value={phoneCode} 
-                  onChange={(e) => setPhoneCode(e.target.value.replace(/\D/g, '').slice(0, 6))} 
-                  placeholder="000000"
+                  type="email" 
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)} 
+                  placeholder="seu@email.com"
+                  style={{ ...styles.input, paddingLeft: '2.8rem' }}
+                  disabled={emailCodeSent}
                   required 
                 />
               </div>
-              <small style={{ color: 'var(--text-tertiary)', display: 'block', marginTop: '10px', textAlign: 'center' }}>
-                Enviamos um código SMS de 6 dígitos para {phone || 'seu celular'}.
-              </small>
             </div>
+
+            {emailCodeSent && (
+              <div className="input-group" style={{ marginBottom: '2rem', textAlign: 'center' }}>
+                <label style={{ ...styles.label, textAlign: 'center' }}>Código de E-mail (6 dígitos)</label>
+                <div style={{ position: 'relative' }}>
+                  <input 
+                    type="text" 
+                    className="input-2fa"
+                    value={emailCode} 
+                    onChange={(e) => setEmailCode(e.target.value.replace(/\D/g, '').slice(0, 6))} 
+                    placeholder="000000"
+                    required 
+                  />
+                </div>
+                <small style={{ color: 'var(--text-tertiary)', display: 'block', marginTop: '10px', textAlign: 'center' }}>
+                  Insira o código de e-mail para validar a sua conta.
+                </small>
+              </div>
+            )}
             
-            <button type="submit" disabled={loading} style={styles.button}>
-              {loading ? 'Concluindo...' : 'Finalizar Cadastro'}
+            <button type="submit" disabled={loading || sendingEmail} style={styles.button}>
+              {sendingEmail ? 'Enviando Código...' : loading ? 'Concluindo...' : emailCodeSent ? 'Finalizar Cadastro' : 'Enviar Código de Confirmação'}
             </button>
             <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-              <button type="button" onClick={() => setStep(2)} style={styles.forgotLink}>
+              <button 
+                type="button" 
+                onClick={() => {
+                  if (emailCodeSent) {
+                    setEmailCodeSent(false);
+                    setEmailCode('');
+                  } else {
+                    setStep(2);
+                  }
+                }} 
+                style={styles.forgotLink}
+              >
                 Voltar
               </button>
             </div>
@@ -327,34 +426,16 @@ const styles = {
     minHeight: '100vh',
     padding: '1.5rem',
     boxSizing: 'border-box',
-    background: 'radial-gradient(circle at 50% 20%, #040503 0%, #000000 100%)',
+    background: '#000000',
     position: 'relative',
     overflowY: 'auto',
     overflowX: 'hidden'
   },
   glowBlob1: {
-    position: 'absolute',
-    width: '380px',
-    height: '380px',
-    borderRadius: '50%',
-    background: 'rgba(94, 255, 0, 0.01)',
-    filter: 'blur(100px)',
-    top: '5%',
-    left: '5%',
-    pointerEvents: 'none',
-    animation: 'blobFloat 15s infinite ease-in-out alternate'
+    display: 'none'
   },
   glowBlob2: {
-    position: 'absolute',
-    width: '380px',
-    height: '380px',
-    borderRadius: '50%',
-    background: 'rgba(63, 168, 0, 0.01)',
-    filter: 'blur(100px)',
-    bottom: '5%',
-    right: '5%',
-    pointerEvents: 'none',
-    animation: 'blobFloat 18s infinite ease-in-out alternate-reverse'
+    display: 'none'
   },
   authContainer: {
     background: 'rgba(4, 5, 3, 0.97)',
@@ -402,7 +483,7 @@ const styles = {
     textAlign: 'left'
   },
   label: {
-    color: '#9CA3AF',
+    color: '#ffffff',
     fontSize: '0.8rem',
     fontWeight: '700',
     letterSpacing: '0.05em'
@@ -425,10 +506,10 @@ const styles = {
     padding: '1rem 2rem',
     fontSize: '0.95rem',
     fontWeight: '700',
-    background: 'linear-gradient(135deg, #5EFF00 0%, #3FA800 100%)',
+    background: '#59e308',
     color: '#000',
     border: 'none',
-    boxShadow: '0 8px 28px rgba(94,255,0,0.28)',
+    boxShadow: 'none',
     cursor: 'pointer',
     marginTop: '0.5rem',
     letterSpacing: '-0.01em',

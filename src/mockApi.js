@@ -183,10 +183,13 @@ axios.interceptors.request.use((config) => {
       const url = cfg.url;
       const method = cfg.method.toUpperCase();
       
-      // Parse query params if available
+      // Parse query params if available (combine search query and config params)
       const urlObj = new URL(url, 'https://localhost');
       const pathname = urlObj.pathname;
-      const params = Object.fromEntries(urlObj.searchParams);
+      const params = {
+        ...Object.fromEntries(urlObj.searchParams),
+        ...(cfg.params || {})
+      };
       
       // Load tables from LocalStorage
       let contacts = getStorageItem('mf_contacts', initialContacts);

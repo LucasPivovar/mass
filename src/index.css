@@ -5,8 +5,8 @@
   
   /* ── Brand Identity ─────────────────────────────── */
   --bg-main:  #000000;
-  --bg-card:  rgba(10, 16, 6, 0.82);
-  --bg-input: rgba(18, 28, 10, 0.55);
+  --bg-card:  #121212;
+  --bg-input: #181818;
 
   --text-primary:   #E5E5E5;
   --text-secondary: #9CA3AF;
@@ -140,16 +140,10 @@ h1 {
   font-size: clamp(1.7rem, 3vw, 2.15rem);
   font-weight: 800;
   margin-top: 0;
-  margin-bottom: 0.4rem;
-  background: var(--accent-flow);
-  margin-bottom: 0.5rem;
   letter-spacing: -0.02em;
-  background: linear-gradient(180deg, #8aff47 0%, #2f7a00 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  color: transparent;
+  color: #ffffff;
   display: inline-block;
+  margin-bottom: 0.5rem;
 }
 
 h2 {
@@ -404,108 +398,103 @@ textarea:focus {
 }
 
 /* Buttons */
-button {
+button:not(.eye-btn):not(.actions-dropdown-trigger):not(.actions-dropdown-item):not(.btn-logout) {
   padding: 0.95rem 2rem;
-  background: rgba(54, 162, 11, 0.16);
-  color: rgb(94, 255, 0); 
-  border: 2px solid rgba(94, 255, 0, 0.2);
+  background: #59e308;
+  color: #000000; 
+  border: 2px solid #59e308;
   border-radius: var(--radius-sm); 
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
-  box-shadow: 0 4px 12px rgba(94, 255, 0, 0.1);
+  box-shadow: none;
   position: relative;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
-button::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -50%;
-  width: 200%;
-  height: 100%;
-  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.15), transparent);
-  transform: skewX(-25deg);
-  transition: 0.75s;
-  pointer-events: none;
+button:not(.eye-btn):hover {
+  transform: translateY(-1px);
+  background: #4ec707;
+  border-color: #4ec707;
+  color: #000000;
+  box-shadow: none;
 }
 
-button:hover {
-  transform: translateY(-2px);
-  background: rgba(54, 162, 11, 0.25);
-  border-color: rgba(94, 255, 0, 0.3);
-  box-shadow: 0 12px 28px rgba(94, 255, 0, 0.2), var(--shadow-glow);
-}
-
-button:hover::after {
-  left: 125%;
-}
-
-button:active {
+button:not(.eye-btn):active {
   transform: translateY(0);
 }
 
-/* Logout / Sair Button */
 button.btn-logout {
-  background: rgba(239, 68, 68, 0.12);
-  border-color: rgba(239, 68, 68, 0.25);
-  box-shadow: none;
-  color: #f87171;
-  justify-content: center;
+  background: transparent !important;
+  border: 2px solid #ef4444 !important;
+  box-shadow: none !important;
+  color: #ef4444 !important;
+  border-radius: 10px !important;
+  font-weight: 800 !important;
+  font-size: 0.95rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.6rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  box-sizing: border-box !important;
 }
 
 button.btn-logout:hover {
-  background: rgba(239, 68, 68, 0.25);
-  border-color: rgba(239, 68, 68, 0.4);
-  color: #ef4444;
+  background: #ef4444 !important;
+  border-color: #ef4444 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
 }
 
 button.secondary {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: var(--text-primary);
+  background: transparent;
+  border: 2px solid #59e308;
+  color: #59e308;
   box-shadow: none;
 }
+
 button.secondary:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.08);
-  color: var(--text-primary);
+  background: #59e308;
+  border-color: #59e308;
+  color: #000000;
   box-shadow: none;
-  transform: none;
+  transform: translateY(-1px);
 }
 
 button.danger {
-  background: rgba(239, 68, 68, 0.15);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.25);
+  background: transparent;
+  border: 2px solid #ef4444;
+  color: #ef4444;
   box-shadow: none;
 }
 
 button.danger:hover {
-  background: rgba(239, 68, 68, 0.3);
-  border-color: rgba(239, 68, 68, 0.4);
-  color: #ef4444;
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #ffffff;
 }
 
 /* Card Gradient Class */
 .card-gradient {
-  background: radial-gradient(circle at center, rgba(94, 255, 0, 0) 0%, rgba(10, 16, 6, 0.82) 100%);
-  border: 1px solid var(--border-glass);
+  background: #090909;
+  border: 1px solid #222222;
   box-shadow: var(--shadow-sm);
   border-radius: 14px;
-  transition: border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
+  transition: border-color 0.22s ease, transform 0.22s ease;
   will-change: transform;
 }
 .card-gradient:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 20px rgba(94,255,0,0.06);
-  border-color: rgba(94,255,0,0.22);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  border-color: #333333;
 }
 
 /* Utilities */
@@ -551,7 +540,7 @@ button.danger:hover {
 
 /* Tables */
 .table-container {
-  background: radial-gradient(circle at center, rgba(94, 255, 0, 0) 0%, rgba(10, 16, 6, 0.82) 100%) !important;
+  background: #090909 !important;
   border-radius: 14px;
   border: 1px solid var(--border-glass);
   overflow-x: auto;
@@ -1067,19 +1056,19 @@ tr:hover td {
 }
 
 .actions-dropdown-trigger {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  color: var(--text-secondary);
-  padding: 8px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  min-width: auto;
-  margin: 0;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: var(--text-secondary) !important;
+  padding: 8px !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+  min-width: auto !important;
+  margin: 0 !important;
 }
 
 .actions-dropdown-trigger:hover {
@@ -1275,3 +1264,63 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+
+/* Borderless input and select overrides for search/filter groups */
+.no-border-input {
+  border: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+}
+
+.no-border-select {
+  border: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2359e308' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.4rem center !important;
+  background-size: 0.95rem !important;
+  padding-right: 1.8rem !important;
+  cursor: pointer !important;
+}
+
+.no-border-input:hover,
+.no-border-input:focus,
+.no-border-select:hover,
+.no-border-select:focus {
+  border: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+  outline: none !important;
+}
+
+/* Highly modern round interactive delete button */
+.btn-delete-modern {
+  background: rgba(239, 68, 68, 0.08) !important;
+  color: #ef4444 !important;
+  border: 1px solid rgba(239, 68, 68, 0.15) !important;
+  border-radius: 10px !important;
+  padding: 8px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  min-width: auto !important;
+}
+
+.btn-delete-modern:hover {
+  background: rgba(239, 68, 68, 0.22) !important;
+  color: #ff5f5f !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+  transform: translateY(-1px) scale(1.04);
+}
+
+.btn-delete-modern:active {
+  transform: translateY(0) scale(1);
+}
+
+

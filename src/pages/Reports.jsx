@@ -12,6 +12,10 @@ const Reports = ({ token }) => {
   // Controls chart animation: renders at 0 then animates to real value
   const [animated, setAnimated] = useState(false);
 
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const campaignsPerPage = 10;
+
   const fetchCampaigns = async () => {
     try {
       setLoading(true);
@@ -57,6 +61,19 @@ const Reports = ({ token }) => {
     const statusMatch = !statusFilter || c.status === statusFilter;
     return nameMatch && statusMatch;
   });
+
+  // Calculate total pages
+  const totalPages = Math.max(Math.ceil(filteredCampaigns.length / campaignsPerPage), 1);
+
+  // Reset to page 1 on filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, statusFilter]);
+
+  const paginatedCampaigns = filteredCampaigns.slice(
+    (currentPage - 1) * campaignsPerPage,
+    currentPage * campaignsPerPage
+  );
 
   // Dynamic Excel/CSV Download Simulator
   const handleDownloadCSV = (c) => {
@@ -132,6 +149,10 @@ const Reports = ({ token }) => {
       {/* KPI Stats Grid */}
       <div className="reports-stats-grid" style={styles.statsGrid}>
         <div style={styles.statCard}>
+          <div>
+            <span style={styles.statLabel}>Total de Campanhas</span>
+            <h2 style={styles.statVal}>{totalCampaigns}</h2>
+          </div>
           <div style={styles.statIconContainer}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="20" x2="18" y2="10"></line>
@@ -139,48 +160,44 @@ const Reports = ({ token }) => {
               <line x1="6" y1="20" x2="6" y2="14"></line>
             </svg>
           </div>
-          <div>
-            <span style={styles.statLabel}>Total de Campanhas</span>
-            <h2 style={styles.statVal}>{totalCampaigns}</h2>
-          </div>
         </div>
 
         <div style={styles.statCard}>
+          <div>
+            <span style={styles.statLabel}>Mensagens Disparadas</span>
+            <h2 style={styles.statVal}>{totalSent}</h2>
+          </div>
           <div style={{ ...styles.statIconContainer, color: 'var(--accent-secondary)' }}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M22 2L11 13"></path>
               <path d="M22 2l-7 20-4-9-9-4 20-7z"></path>
             </svg>
           </div>
-          <div>
-            <span style={styles.statLabel}>Mensagens Disparadas</span>
-            <h2 style={styles.statVal}>{totalSent}</h2>
-          </div>
         </div>
 
         <div style={styles.statCard}>
+          <div>
+            <span style={styles.statLabel}>Taxa Média de Entrega</span>
+            <h2 style={{ ...styles.statVal, color: '#ffffff' }}>{avgDeliveryRate}%</h2>
+          </div>
           <div style={{ ...styles.statIconContainer, color: '#34d399' }}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
               <polyline points="22 4 12 14.01 9 11.01"></polyline>
             </svg>
           </div>
-          <div>
-            <span style={styles.statLabel}>Taxa Média de Entrega</span>
-            <h2 style={{ ...styles.statVal, color: '#34d399' }}>{avgDeliveryRate}%</h2>
-          </div>
         </div>
 
         <div style={styles.statCard}>
+          <div>
+            <span style={styles.statLabel}>Taxa Média de Leitura</span>
+            <h2 style={{ ...styles.statVal, color: '#ffffff' }}>{avgReadRate}%</h2>
+          </div>
           <div style={{ ...styles.statIconContainer, color: '#5EFF00' }}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
               <circle cx="12" cy="12" r="3"></circle>
             </svg>
-          </div>
-          <div>
-            <span style={styles.statLabel}>Taxa Média de Leitura</span>
-            <h2 style={{ ...styles.statVal, color: 'var(--accent-secondary)' }}>{avgReadRate}%</h2>
           </div>
         </div>
       </div>
@@ -290,6 +307,7 @@ const Reports = ({ token }) => {
             placeholder="Buscar por nome de campanha ou tag..." 
             value={search} 
             onChange={(e) => setSearch(e.target.value)} 
+            className="no-border-input"
             style={styles.searchInput}
           />
         </div>
@@ -305,6 +323,7 @@ const Reports = ({ token }) => {
           <select 
             value={statusFilter} 
             onChange={(e) => setStatusFilter(e.target.value)} 
+            className="no-border-select"
             style={styles.selectFilter}
           >
             <option value="">Todos os status</option>
@@ -336,7 +355,7 @@ const Reports = ({ token }) => {
               </tr>
             </thead>
             <tbody>
-              {filteredCampaigns.map(c => {
+              {paginatedCampaigns.map(c => {
                 const readRate = c.total_sent > 0 ? Math.round((c.total_read / c.total_sent) * 100) : 0;
                 return (
                   <tr key={c.id}>
@@ -383,7 +402,7 @@ const Reports = ({ token }) => {
                         </span>
                       )}
                       {c.status === 'scheduled' && (
-                        <span className="badge queued" style={{ background: 'rgba(6, 182, 212, 0.15)', color: '#06b6d4', border: '1px solid rgba(6, 182, 212, 0.3)' }}>
+                        <span className="badge queued" style={{ background: 'rgba(255, 255, 255, 0.08)', color: '#ffffff', border: '1px solid rgba(255, 255, 255, 0.15)' }}>
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
                             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                             <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -452,6 +471,31 @@ const Reports = ({ token }) => {
               )}
             </tbody>
           </table>
+
+          {/* Pagination Controls */}
+          {filteredCampaigns.length > 0 && (
+            <div style={styles.paginationContainer}>
+              <button 
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+                disabled={currentPage === 1}
+                className="secondary"
+                style={styles.paginationBtn}
+              >
+                Anterior
+              </button>
+              <span style={styles.paginationInfo}>
+                Página {currentPage} de {totalPages}
+              </span>
+              <button 
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+                disabled={currentPage === totalPages}
+                className="secondary"
+                style={styles.paginationBtn}
+              >
+                Próxima
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -466,8 +510,8 @@ const styles = {
     marginBottom: '3rem'
   },
   chartCard: {
-    background: 'radial-gradient(circle at center, rgba(94, 255, 0, 0) 0%, rgba(10, 16, 6, 0.82) 100%)',
-    border: '1px solid var(--border-glass)',
+    background: '#090909',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
     borderRadius: '14px',
     padding: '1.5rem',
     boxShadow: 'var(--shadow-sm)',
@@ -571,12 +615,14 @@ const styles = {
     marginBottom: '3rem'
   },
   statCard: {
-    background: 'radial-gradient(circle at center, rgba(94, 255, 0, 0) 0%, rgba(10, 16, 6, 0.82) 100%)',
-    border: '1px solid var(--border-glass)',
+    background: '#090909',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
     borderRadius: '14px',
     padding: '1.5rem',
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     boxShadow: 'var(--shadow-sm)',
     transition: 'border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease'
   },
@@ -652,6 +698,27 @@ const styles = {
     boxShadow: 'none',
     margin: 0,
     width: '100%'
+  },
+  paginationContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: '1.25rem',
+    padding: '1.25rem',
+    borderTop: '1px solid var(--border-glass)',
+    background: 'rgba(10, 15, 30, 0.2)'
+  },
+  paginationBtn: {
+    padding: '0.5rem 1.25rem',
+    fontSize: '0.85rem',
+    borderRadius: '8px',
+    boxShadow: 'none',
+    minWidth: '100px'
+  },
+  paginationInfo: {
+    fontSize: '0.9rem',
+    color: 'var(--text-secondary)',
+    fontWeight: '600'
   }
 };
 
